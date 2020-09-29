@@ -1,0 +1,307 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Banking API for creating accounts and transactions",
+        "version": "1.0.0",
+        "title": "Banking API",
+        "contact": {
+            "email": "otavioag99@gmail.com"
+        },
+        "license": {
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "localhost:5000",
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Accounts"
+        },
+        {
+            "name": "Transactions"
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/accounts": {
+            "post": {
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Creates account",
+                "description": "Endpoint used to create a new account associated with the owner's document number",
+                "operationId": "createAccount",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Object containing account owner's document number",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "document_number"
+                            ],
+                            "properties": {
+                                "document_number": {
+                                    "type": "string",
+                                    "example": "12345678900"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "example": 1
+                                },
+                                "document_number": {
+                                    "type": "string",
+                                    "example": "12345678900"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/accounts/{accountId}": {
+            "get": {
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Gets account by ID",
+                "description": "",
+                "operationId": "getAccountByID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "accountId",
+                        "in": "path",
+                        "description": "ID of the account that needs to be fetched",
+                        "required": true,
+                        "type": "integer",
+                        "format": "uint64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Account"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions": {
+            "post": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Creates transaction",
+                "description": "Endpoint used to create a transaction associated with an existing account. If the operation type ID is 1, 2 or 3, the transaction amount must be negative. On the other hamd, if the operation type ID is 4, the transaction amount must be positive",
+                "operationId": "createTransaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Object containing transaction information",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "account_id",
+                                "operation_type_id",
+                                "amount"
+                            ],
+                            "properties": {
+                                "account_id": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "example": 1
+                                },
+                                "operation_type_id": {
+                                    "type": "integer",
+                                    "format": "uint64",
+                                    "enum": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "description": "1 - COMPRA A VISTA\n2 - COMPRA PARCELADA\n 3 - SAQUE\n 4 - PAGAMENTO"
+                                },
+                                "amount": {
+                                    "type": "number",
+                                    "format": "float64",
+                                    "example": -99.99
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/Transaction"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Account": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "example": 1
+                },
+                "document_number": {
+                    "type": "string",
+                    "example": "12345678900"
+                }
+            }
+        },
+        "ApiErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "description": "Error message"
+                }
+            }
+        },
+        "Transaction": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "example": 1
+                },
+                "account_id": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "example": 1
+                },
+                "operation_type_id": {
+                    "type": "integer",
+                    "format": "uint64",
+                    "enum": [
+                        1,
+                        2,
+                        3,
+                        4
+                    ],
+                    "description": "1 - COMPRA A VISTA\n2 - COMPRA PARCELADA\n 3 - SAQUE\n 4 - PAGAMENTO"
+                },
+                "amount": {
+                    "type": "number",
+                    "format": "float64",
+                    "example": 99.99
+                },
+                "eventDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2020-09-27T21:01:47.721504334Z"
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}

@@ -1,0 +1,29 @@
+version: "3.2"
+services: 
+    db:
+        image: mysql
+        environment: 
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - ./sql/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+        ports:
+            - 3306:3306
+        container_name: db
+
+    api:
+        build: .
+        ports: 
+            - 5000:5000
+        depends_on: 
+            - db
+        container_name: api
+
+    swagger:
+        image: swaggerapi/swagger-ui
+        environment:
+          SWAGGER_JSON: /specs/swagger.json
+        volumes: 
+            - ./swagger/swagger.json:/specs/swagger.json
+        ports: 
+            - 8080:8080
+        container_name: swagger
